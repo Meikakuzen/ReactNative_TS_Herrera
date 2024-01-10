@@ -14,7 +14,7 @@
 
 ## NOTA: Problemas durante la instalación
 
-- No puede instalar HAMX en un windows con Intel con la virtualización enabled
+- No puede instalar HAMX en un windows con Intel con la virtualización con Hyper-V enabled
 - Al intentar lanzar el software para instalarlo manualmente ya que no puedo hacerlo desde el SDK de Android Studio me dice que o mi pc no acepta la virtualización de intel (que no es) o Hyper-V usa exclusivamente la virtualización.
 - Cuando miro información del sistema, en virtualización dice que demanda integridad del código.
 - **Pero primero probar** en Seguridad de Windows/ seguridad del dispositivo/ desactivar integridad de memoria
