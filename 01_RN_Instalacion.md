@@ -117,3 +117,6 @@ pause
 
 > npx react-native run-android
 
+- Para tener el intellisense de react native (si falla)
+
+> npm install --save @types/react-native
