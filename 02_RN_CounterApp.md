@@ -881,29 +881,36 @@ const styles = StyleSheet.create({
 - Para **border** se le añade **Width**
   - borderWidth
   - borderLeftWidth
-- El componente **SafeAreaView** sirve para que lo que renderice no choque con el noutch
+- El componente **SafeAreaView** sirve para que lo que renderice no choque con el notch
 - Rara vez se coloca a nivel de aplicación (en App, nivel superior)
 - Para crear el snippet **stles** para crear de una el StyleSheet
 - View / Command Palette / user snippets typescriptreact.json
 - Creo también el snippet para un componente con un View y un Text dentro
+ 
 ~~~json
 	"React Native Styles":{
-		"prefix": "stles",
-		"body": [
-			"const styles = StyleSheet.create({",
-			"      $1",
-			 "});"
-		],
-		"prefix": "rvc",
-		"body": [
-			"const Component = ()=>{",
-			"return (",
-			" <View>",
-			"     <Text></Text>",
-			  "</View>",
-			   ")}"
+
+		"Component":{
+			"prefix": "rvc",
+			"body": [
+				"const Component = ()=>{",
+				"return (",
+				" <View>",
+				"     <Text></Text>",
+			  	"</View>",
+			   	")}"
 		]
-	}
+		},
+		"styleSheet":{
+			"prefix": "stles",
+			"body": [
+				"const styles = StyleSheet.create({",
+				"      $1",
+			 	"});"
+		]	
+		}
+		
+	},
 ~~~
 
 - Uso **flex:1** para que ocupe todo el espacio del padre
