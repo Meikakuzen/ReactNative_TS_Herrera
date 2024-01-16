@@ -866,3 +866,93 @@ const styles = StyleSheet.create({
 - Si uso **TouchableNativeFeedback** debo **colocarlo en un View para aplicarle estilos**
   - Tengo la propiedad **background** en la que colocar una expresión de javascript, en este caso Ripple (un método de TouchableNativeFeedback que le dá un efecto al botón al presionarlo)
 - Para **renderizar** un componente **de manera distinta** en **ios y android** uso dos funciones y renderizo condicionalmente con el objeto **Platform**
+-----
+
+## Apuntes Object Model, Position, Flex
+
+- Para **margin** tenemos
+  - marginBottom
+  - marginTop
+  - marginLeft
+  - marginRight
+  - marginVertical (arriba y abajo)
+  - marginHorizontal (ambos lados)
+- Para **padding es lo mismo**
+- Para **border** se le añade **Width**
+  - borderWidth
+  - borderLeftWidth
+- El componente **SafeAreaView** sirve para que lo que renderice no choque con el noutch
+- Rara vez se coloca a nivel de aplicación (en App, nivel superior)
+- Para crear el snippet **stles** para crear de una el StyleSheet
+- View / Command Palette / user snippets typescriptreact.json
+- Creo también el snippet para un componente con un View y un Text dentro
+~~~json
+	"React Native Styles":{
+		"prefix": "stles",
+		"body": [
+			"const styles = StyleSheet.create({",
+			"      $1",
+			 "});"
+		],
+		"prefix": "rvc",
+		"body": [
+			"const Component = ()=>{",
+			"return (",
+			" <View>",
+			"     <Text></Text>",
+			  "</View>",
+			   ")}"
+		]
+	}
+~~~
+
+- Uso **flex:1** para que ocupe todo el espacio del padre
+- Los padres se adecúan al espacio de sus hijos
+- Si coloco flex:1 en un nivel superior (a nivel de aplicación) **ocupará toda la pantalla**
+- Es preferible usar un height y un width porcentual y no poner unidades
+- Aún mejor es usar **las dimensiones del dispositivo**
+  - Con **Dimensions** obtendre las dimensiones del dispositivo fijas
+  - Puedo hacer una copia de los estilos y añadir un width porcentual
+
+~~~js
+const {height, width} = Dimensions.get('window')
+
+<View
+style={{...styles.caja, width: width * 0.2}} //para que ocupe un 20%
+> </View>
+~~~
+
+- Pero si coloco el móvil **en horizontal**, el **height y el width variarán**
+- Para eso está el hook **useWindowDimensions**
+
+~~~js
+const {height, width} = useWindowDimensions()
+~~~
+
+### Position
+
+- **Por defecto** la position es **relativa**. Si incremento el top la caja bajará
+- Solo tenemos **relative** y **absolute**. La absolut **es relativa al padre**
+- El **bottom en 0** con **position: absolute** me llevará la caja abajo del todo, porque es relativa al padre
+  - Le estoy diciendo que se vaya al final del padre
+- Con position relative **los elementos no empujan a otros**. Aunque el otro elemento tenga position absolute, lo solaparía
+- Por defecto los elementos se muestran en columna. 
+  - Si el primer elemento es absolute y agrego un relative, lo agregará encima. Es como si no tuviera ningún espacio
+
+### Flexbox en React Native
+
+- Creo un View con **flex:1** a nivel de aplicación para que ocupe toda la pantalla
+- Creo 3 cajas
+  - Si solo le coloco flex:1 a la caja1, ocupará todo el espacio dejando el mínimo posible a caja2 y caja3
+  - Si coloco flex:4 a caja1 y caja2 y flex:2 a caja3 ocuparán 40% 40% y 20%
+  - Si tengo 2 cajas y a las dos les coloco flex:1 ocuparán 50% y 50%
+- **flexDirection** tiene lo de siempre: column, row, column-reverse, row-reverse
+- **justifyContent** tiene flex-start por defecto
+- Depende si está en column o row trabajará en vertical u horizontal
+  - **space-around** deja el mismo espacio entre el borde de la primera caja y la última, equiparando espacios entre las mismas
+  - **space-between** equipara distancia entre los elementos
+  - **space-evenly** pone la misma distancia entre el borde y los elementos
+- **alignItems** tiene **stretch por defecto**, que hará que se estiren los elementos lo más que puedan
+  - Tengo flex-end, flex-start, baseline, center
+- Con **alignSelf** puedo usar las propiedades de alignItems para que un elemento se situe ignorando al padre
+- **flexWrap** se usa para especificar el comportamiento de los elementos cuando estos ocupen más que el contenedor padre
