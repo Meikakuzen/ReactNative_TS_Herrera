@@ -447,5 +447,272 @@ return (
 <BotonCalc texto="0" ancho />
 ~~~
 
--
+### Resumen:
+
+- **Desestructuro los estilos** y añado las condiciones en la propiedad específica para renderizar condicionalmente con un estilo u otro
+- Añado **props booleanas** opcionales **que alteren el componente** en el caso de declararlas
+--------
+
+## Construir el número base
+
+- Podemos usar un useState
+- El número será de **tipo string** porque estoy usando el componente Text
+- Coloco el state en el Text de resultado
+- El botón de C lo que hace es establecer el valor a 0 (como string!)
+  - Creo la función para la tecla C y la llamo limpiar
+  - Necesito **añadirle la prop para que ejecute la acción**. La llamaré acción.
+    - Si no se como tiparlo en la interface, hago la declaración de la propiedad en el componente con la función y **pongo el cursor encima**
+    - **La pongo opcional (de momento)** para que no me marque error en el resto de componentes, pero debe ser obligatoria
+    - **La desestructuro de las props y se la añado al onPress**
+  
+~~~js
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+
+interface Props{
+    texto: string,
+    color?: string,
+    ancho?: boolean,
+    accion?: () => void  //de momento la pongo opcional para que no moleste 
+}
+                                                                //añado la prop
+export const BotonCalc = ({texto, color="#2D2D2D", ancho = false, accion}: Props)=>{
+return (
+
+    <TouchableOpacity
+    onPress={accion}>  
+    <View style={{
+        ...styles.boton,
+        backgroundColor: color,
+        width: ancho ? 180 : 80 
+    } }>
+        <Text style={{
+            ...styles.botonTexto,
+            color: (color === '#9B9B9B') ? 'black': "white",
+        }}>{texto}</Text>
+    </View>
+    </TouchableOpacity>
+)}
+
+const styles = StyleSheet.create({
+    boton:{
+        height: 80,
+        width:80,
+        borderRadius: 100,
+        justifyContent: 'center',
+        
+    },
+    botonTexto:{
+        textAlign: 'center',
+        color: 'white',
+        padding: 10,
+        fontSize: 30,
+        fontWeight: '400'
+    },
+
+});
+~~~
+
+- En la calculadora le paso la función específica de la tecla
+
+~~~js
+export const CalculadoraScreen = ()=>{
+
+    const [numero, setNumero] = useState('100')
+
+    const limpiar =()=>{
+        setNumero('0')
+    }
+
+return (
+ <View style={styles.calculadoraContainer}>
+     <Text style={styles.resultadoPequeno}>1500</Text>
+     <Text style={styles.resultado}>{numero}</Text>
+
+    <View style={styles.fila}>
+        <BotonCalc texto="C" color="#9B9B9B"
+                    accion={limpiar} />
+    {...code}
+)}
+~~~
+
+- Para el número que hay encima usaré otro useState que llamaré numeroAnterior
+- Lo coloco en la etiqueta Text. No lo debería de mostrar a menos que tenga un valor. *Lo puliremos después*
+- Creo la función armarNumero, **a todos los números debo pasarles armarNumero**. El punto debería considerarse parte del número, también lo pongo
+
+~~~js
+ const armarNumero =(numeroTexto: string)=>{
+        setNumero(numero + numeroTexto)
+    }
+~~~
+
+- Me da error porque **la función me pide un argumento y en la interfaz no he puesto ninguno**. Lo pongo de tipo string. accion ya no es opcional!
+- - Ahora **me marca error** porque cuando le paso la accion en el **onPress del componente no tiene ningun argumento**
+- **Le paso el texto** (que es el número) y solucionado
+
+~~~js
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+
+interface Props{
+    texto: string,
+    color?: string,
+    ancho?: boolean,
+    accion: (numeroTexto: string) => void
+}
+
+export const BotonCalc = ({texto, color="#2D2D2D", ancho = false, accion}: Props)=>{
+return (
+
+    <TouchableOpacity
+    onPress={()=>accion(texto)}>
+    <View style={{
+        ...styles.boton,
+        backgroundColor: color,
+        width: ancho ? 180 : 80 
+    } }>
+        <Text style={{
+            ...styles.botonTexto,
+            color: (color === '#9B9B9B') ? 'black': "white",
+        }}>{texto}</Text>
+    </View>
+    </TouchableOpacity>
+)}
+
+const styles = StyleSheet.create({
+    boton:{
+        height: 80,
+        width:80,
+        borderRadius: 100,
+        justifyContent: 'center',
+        
+    },
+    botonTexto:{
+        textAlign: 'center',
+        color: 'white',
+        padding: 10,
+        fontSize: 30,
+        fontWeight: '400'
+    },
+
+});
+~~~
+
+- Ahora me marcan error **todos los botones que no tienen la prop accion**. Eso está bien
+- Copio y pego la acción de limpiar **para que no estorbe con los errores** de esos botones que no son numeros **que ya tienen la funcion armarNumero**
+- Ahora, cuando coloco muchos números la fila se coloca encima y lo que quiero es que los números se hagan más pequeños
+- Lo configuro en la etiqueta Text de resultado
+  - Uso las propiedades **numberOfLines** y **adjustsFontSizeToFit**
+- CalculadoraScreen
+
+~~~js
+return (
+ <View style={styles.calculadoraContainer}>
+     <Text style={styles.resultadoPequeno}>{numeroAnterior}</Text>
+     <Text style={styles.resultado}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+     >{numero}</Text> 
+     
+{...code}
+)
+~~~
+
+- Hay varias cosas a validar.
+- Por ejemplo, no me debería permitir colocar varios ceros delante
+- No me debería permitir 0000.00
+- Tampoco deberían salir los números con un 0 delante 08983 como pasa actualmente 
+
+### Resumen:
+
+- Uso un state de tipo string porque el componente es un Text
+- Declaro la función en la interfaz, la desestructuro de las props del componente y se la paso al onPress
+  - Como le tengo que pasar un argumento la ejecuto con una función de flecha
+- Utilizo los atributos **numberOfLines** y **adjustsFontSizeToFit** para ajustar el resultado en una linea y el tamaño de los números se adapte
+-------
+
+## Consideraciones para armar el número
+
+- Creo la función para el botón  -/+
+- Uso .replace para sustituir el - por un string vacío
+- Le paso la función a la tecla en lugar de la de limpiar que tenia para que no molestara con el error
+~~~js
+const positivoNegativo = ()=>{
+        if(numero.includes('-')){
+            setNumero(numero.replace('-',''))
+        }else{
+            setNumero('-'+ numero)
+        }
+    }
+~~~
+
+- De esta manera puedo poner -00.0 y es un poco raro
+- En la función aramarNumero hay que hacer una serie de validaciones 
+  
+~~~js
+const armarNumero =(numeroTexto: string)=>{
+    //no aceptar doble punto
+    if(numero.includes('.') && numeroTexto === '.') return;
+    
+    //si el numero empieza con 0 o -0
+    if( numero.startsWith('0') || numero.startsWith('-0')){
+        
+        //Me permite agregar punto decimal
+        if(numeroTexto === '.'){
+            setNumero(numero + numeroTexto)
+            
+            //Evaluar si es otro 0 y hay un punto
+        }else if(numeroTexto === '0' && numero.includes('.')){
+            setNumero(numero + numeroTexto) //Esto mer permite escribir 0.0000
+        
+            //Evaluar si es un número diferente de 0 y no hay un punto
+            //Si el numero es 0 y no hay un punto debería sustiuir el 0 por el numero
+        }else if(numeroTexto !== '0' && !numero.includes('.')){
+            setNumero(numeroTexto)
+        
+            //No poder escribir 000.00000000
+        }else if(numeroTexto === '0' && !numero.includes('.')){
+            
+            setNumero(numero) //ignoro cualquier entrada
+        
+        }
+    }else{
+        setNumero(numero+numeroTexto)
+    }
+
+
+}
+~~~ 
+------
+
+## Botón de borrar última entrada
+
+- El del debe borrar solo el último dato (el último número introducido)
+- Creo la función. De esta forma es bastante legible
+
+~~~js
+const btnDelete =()=>{
+    const esNegativo = numero.includes('-')
+    let nuevoNumero = numero.substring(0, numero.length -1)
+
+    if(esNegativo){
+        nuevoNumero = nuevoNumero.substring(1)
+    }
+
+    setNumero(esNegativo? '-'+ nuevoNumero : nuevoNumero)
+
+    if (nuevoNumero === ''){
+        setNumero('0')
+    }
+}
+~~~
+
+- Esta podría ser la manera más eficiente
+
+~~~js
+const btnDelete =()=>{
+    if(numero.length === 1 || numero.startsWith('-') && numero.length === 2){
+        return setNumero('0')
+    }
+    setNumero(numero.slice(0,-1))
+}
+~~~
 
